@@ -5,27 +5,38 @@ import org.apdplat.word.segmentation.SegmentationAlgorithm;
 import org.apdplat.word.segmentation.SegmentationFactory;
 import org.apdplat.word.segmentation.Word;
 
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
 
-public class SimHashBaseOnWord extends TextSimilarity  {
+public class CalSimilarity extends TextSimilarity  {
 
     // 生成 64 位的 SimHash
     private int hashBitCount = 64;
 
-
-    public SimHashBaseOnWord(){
+    public CalSimilarity(){
         Hash s = new Hash();
     }
 
-    public SimHashBaseOnWord(int hashBitCount) {
+    public CalSimilarity(int hashBitCount) {
         this.hashBitCount = hashBitCount;
     }
 
     protected double scoreImpl(List<Word> words1, List<Word> words2){
-        return 0;
+        //用词频来标注词的权重
+        taggingWeightWithWordFrequency(words1, words2);
+        //计算SimHash
+        String simHash1 = new Hash().simHash(words1);
+        String simHash2 = new Hash().simHash(words2);
+        //计算SimHash值之间的汉明距离
+        int hammingDistance = hammingDistance(simHash1, simHash2);
+        if(hammingDistance == -1){
+            return 0.0;
+        }
+
+        int maxDistance = simHash1.length();
+        double score = (1 - hammingDistance / (double)maxDistance);
+        return score;
     }
 
     /**

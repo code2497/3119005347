@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CalSimilarity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">duplicate-checking</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">CalSimilarity.java</span></div><h1>CalSimilarity.java</h1><pre class="source lang-java linenums">import org.apdplat.word.analysis.TextSimilarity;
+import org.apdplat.word.recognition.StopWord;
+import org.apdplat.word.segmentation.Segmentation;
+import org.apdplat.word.segmentation.SegmentationAlgorithm;
+import org.apdplat.word.segmentation.SegmentationFactory;
+import org.apdplat.word.segmentation.Word;
+
+import java.util.Collections;
+import java.util.List;
+
+
+public class CalSimilarity extends TextSimilarity  {
+
+    // 生成 64 位的 SimHash
+<span class="pc" id="L15">    private int hashBitCount = 64;</span>
+
+<span class="fc" id="L17">    public CalSimilarity(){</span>
+<span class="fc" id="L18">        Hash s = new Hash();</span>
+<span class="fc" id="L19">    }</span>
+
+<span class="nc" id="L21">    public CalSimilarity(int hashBitCount) {</span>
+<span class="nc" id="L22">        this.hashBitCount = hashBitCount;</span>
+<span class="nc" id="L23">    }</span>
+
+    protected double scoreImpl(List&lt;Word&gt; words1, List&lt;Word&gt; words2){
+        //用词频来标注词的权重
+<span class="fc" id="L27">        taggingWeightWithWordFrequency(words1, words2);</span>
+        //计算SimHash
+<span class="fc" id="L29">        String simHash1 = new Hash().simHash(words1);</span>
+<span class="fc" id="L30">        String simHash2 = new Hash().simHash(words2);</span>
+        //计算SimHash值之间的汉明距离
+<span class="fc" id="L32">        int hammingDistance = hammingDistance(simHash1, simHash2);</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        if(hammingDistance == -1){</span>
+<span class="nc" id="L34">            return 0.0;</span>
+        }
+
+<span class="fc" id="L37">        int maxDistance = simHash1.length();</span>
+<span class="fc" id="L38">        double score = (1 - hammingDistance / (double)maxDistance);</span>
+<span class="fc" id="L39">        return score;</span>
+    }
+
+    /**
+     * 计算等长的SimHash值的汉明距离
+     * @param simHash1 SimHash值1
+     * @param simHash2 SimHash值2
+     * @return 汉明距离
+     */
+    public int hammingDistance(String simHash1, String simHash2) {
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (simHash1.length() != simHash2.length()) {</span>
+<span class="fc" id="L50">            return this.hashBitCount;</span>
+        }
+
+<span class="fc" id="L53">        int distance = 0;</span>
+<span class="fc" id="L54">        int len = simHash1.length();</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        for (int i = 0; i &lt; len; i++) {</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            if (simHash1.charAt(i) != simHash2.charAt(i)) {</span>
+<span class="fc" id="L57">                distance++;</span>
+            }
+        }
+
+<span class="fc" id="L61">        return distance;</span>
+    }
+
+    /**
+     * 对文本进行分词
+     * @param text
+     * @return
+     */
+    private List&lt;Word&gt; seg(String text) {
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if(text == null){</span>
+<span class="nc" id="L71">            return Collections.emptyList();</span>
+        }
+
+<span class="nc" id="L74">        Segmentation segmentation  = SegmentationFactory.getSegmentation(SegmentationAlgorithm.MaxNgramScore);</span>
+<span class="nc" id="L75">        List&lt;Word&gt; words = segmentation.seg(text);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if(filterStopWord) {</span>
+            //停用词过滤
+<span class="nc" id="L78">            StopWord.filterStopWords(words);</span>
+        }
+<span class="nc" id="L80">        return words;</span>
+    }
+
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

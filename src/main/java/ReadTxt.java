@@ -9,7 +9,7 @@ public class ReadTxt {
         if(file.isFile() && file.exists()){
             try {
                 FileInputStream fileInputStream = new FileInputStream(file);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream,"UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
                 StringBuffer sb = new StringBuffer();
