@@ -46,6 +46,10 @@ public class CalSimilarity extends TextSimilarity  {
      * @return 汉明距离
      */
     public int hammingDistance(String simHash1, String simHash2) {
+        if (simHash1 == null || simHash2 == null) {
+            throw new NullPointerException("用于运算海明距离的字符串为空");
+        }
+
         if (simHash1.length() != simHash2.length()) {
             return this.hashBitCount;
         }
